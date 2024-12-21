@@ -39,10 +39,20 @@ resource "aws_route_table" "provider_private_rt" {
   }
 }
 
+resource "aws_route_table" "provider_private_rt_2" {
+  vpc_id = aws_vpc.provider_vpc.id
 
+  tags = {
+    Name = "Provider-Private-RT2"
+  }
+}
 
-resource "aws_route_table_association" "provider_private_rta_2" {
-  subnet_id      = aws_subnet.provider_private_subnet_2.id
+resource "aws_route_table_association" "provider_private_rta_1" {
+  subnet_id      = aws_subnet.provider_private_subnet_1.id
   route_table_id = aws_route_table.provider_private_rt.id
 }
 
+resource "aws_route_table_association" "provider_private_rta_2" {
+  subnet_id      = aws_subnet.provider_private_subnet_2.id
+  route_table_id = aws_route_table.provider_private_rt_2.id
+}

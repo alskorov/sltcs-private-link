@@ -18,8 +18,6 @@ variable "private_subnet_cidrs_provider" {
   default = ["10.0.1.0/24","10.0.3.0/24"]
 }
 
-
-
 variable "instance_ami" {
   description = "AMI ID for EC2 instances"
   type        = string
@@ -39,7 +37,7 @@ variable "consumer_availability_zones" {
 variable "private_subnet_cidrs_consumer" {
   type    = list(string)
   default = [
-    "10.1.3.0/24"#private
+    "10.1.4.0/24"#private
   ] 
 }
 
