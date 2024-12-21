@@ -12,25 +12,14 @@ resource "aws_instance" "provider_instance" {
 
   user_data = <<-EOF
     #!/bin/bash
-    sudo yum install -y nginx
-    sudo systemctl start nginx
-    sudo systemctl enable nginx
 
-    # Create a new user with /bin/bash as the default shell
-    sudo useradd -m -s /bin/bash testuser
-    echo 'testuser:testuser' | sudo chpasswd
+    # Create a directory to serve files
+    sudo mkdir -p /var/www/html
+    echo "Hello, World!" | sudo tee /var/www/html/index.html
 
-    # Grant sudo privileges
-    sudo usermod -aG wheel testuser
-
-    # Allow password-based authentication
-    sudo sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
-    sudo sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
-    sudo sed -i 's/^PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-
-    # Restart SSH service
-    sudo systemctl restart sshd
-  EOF
+    # Start a Python HTTP server on port 80
+    sudo python3 -m http.server 80 --directory /var/www/html &
+EOF
 }
 
 resource "aws_instance" "consumer_instance" {
