@@ -16,7 +16,7 @@ provider "aws" {
 data "terraform_remote_state" "provider" {
   backend = "s3" 
   config = {
-    bucket = "pv-testing-1"
+    bucket = "aleksey-pv-testing"
     key    = "provider/terraform.tfstate"
     region = var.region
   }

@@ -1,6 +1,6 @@
 variable "region" {
   type    = string
-  default = "us-east-2"
+  default = "us-west-2"
 }
 
 variable "provider_vpc_cidr" {
@@ -21,7 +21,7 @@ variable "private_subnet_cidrs_provider" {
 variable "instance_ami" {
   description = "AMI ID for EC2 instances"
   type        = string
-  default     = "ami-036841078a4b68e14"  
+  default     = "ami-05d38da78ce859165"  
 }
 
 variable "instance_type" {
@@ -31,7 +31,7 @@ variable "instance_type" {
 
 
 variable "consumer_availability_zones" {
-  default = ["us-east-2a", "us-east-2b"] 
+  default = ["us-west-2a", "us-west-2b"] 
 }
 
 variable "private_subnet_cidrs_consumer" {
