@@ -13,7 +13,7 @@ resource "aws_subnet" "provider_private_subnet_1" {
   cidr_block              = var.private_subnet_cidrs_provider[0] # First CIDR block
   availability_zone       = "us-east-2a" 
   
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
 
   tags = {
     Name = "Provider-Private-Subnet-1"
