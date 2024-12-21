@@ -13,11 +13,11 @@ provider "aws" {
 }
 
 
-data "terraform_remote_state" "provider" {
-  backend = "s3" 
-  config = {
-    bucket = "aleksey-pv-testing"
-    key    = "provider/terraform.tfstate"
-    region = var.region
-  }
-}
+# data "terraform_remote_state" "provider" {
+#   backend = "s3" 
+#   config = {
+#     bucket = "aleksey-aleksey-pv"
+#     key    = "provider/terraform.tfstate"
+#     region = var.region
+#   }
+# }

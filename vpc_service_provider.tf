@@ -11,7 +11,7 @@ resource "aws_vpc" "provider_vpc" {
 resource "aws_subnet" "provider_private_subnet_1" {
   vpc_id                  = aws_vpc.provider_vpc.id
   cidr_block              = var.private_subnet_cidrs_provider[0] # First CIDR block
-  availability_zone       = "us-east-2a" 
+  availability_zone       = var.provider_availability_zones[0] 
   
   map_public_ip_on_launch = false
 
@@ -23,7 +23,7 @@ resource "aws_subnet" "provider_private_subnet_1" {
 resource "aws_subnet" "provider_private_subnet_2" {
   vpc_id                  = aws_vpc.provider_vpc.id
   cidr_block              = var.private_subnet_cidrs_provider[1] # Second CIDR block
-  availability_zone       = "us-east-2b" 
+  availability_zone       = var.provider_availability_zones[1] 
   map_public_ip_on_launch = false
 
   tags = {

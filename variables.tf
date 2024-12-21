@@ -34,6 +34,11 @@ variable "consumer_availability_zones" {
   default = ["us-west-2a", "us-west-2b"] 
 }
 
+variable "provider_availability_zones" {
+  default = ["us-west-2a", "us-west-2b"] 
+}
+
+
 variable "private_subnet_cidrs_consumer" {
   type    = list(string)
   default = [
