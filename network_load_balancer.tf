@@ -3,8 +3,8 @@ resource "aws_lb" "nlb" {
   load_balancer_type = "network"
   internal           = true
   subnets            = [
-    aws_subnet.provider_public_subnet_1.id, 
-#    aws_subnet.provider_private_subnet_2.id
+    aws_subnet.provider_private_subnet_1.id, 
+    aws_subnet.provider_private_subnet_2.id
   ]
   security_groups = [aws_security_group.nlb_sg.id]
 

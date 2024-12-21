@@ -100,6 +100,6 @@ resource "aws_route_table" "provider_public_rt" {
 }
 
 resource "aws_route_table_association" "provider_public_rta_1" {
-  subnet_id      = aws_subnet.provider_public_subnet_1.id
+  subnet_id      = aws_subnet.provider_private_subnet_1.id
   route_table_id = aws_route_table.provider_public_rt.id
 }
