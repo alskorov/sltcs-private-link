@@ -11,7 +11,7 @@ This project  AWS infrastructure to connect two EC2 instances, one in a **Provid
 
 
 ### **Internet Gateway**
-- Attached to the Consumer VPC for internet access via the public subnet.
+- Attached to the Consumer VPC (Bastion Host) for internet access via the public subnet.
 
 ### **Route Tables**
 - **Provider VPC**: Routes traffic between private subnets and the private link.

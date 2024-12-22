@@ -35,11 +35,6 @@ resource "aws_route_table" "consumer_private_rt" {
   depends_on = [aws_vpc_endpoint.consumer_endpoint]
 }
 
-resource "aws_route" "consumer_to_provider" {
-  route_table_id         = aws_route_table.consumer_private_rt.id
-  destination_cidr_block = "10.0.0.0/16" # Provider VPC CIDR
-  network_interface_id   = "eni-03c66932e84cdfd4a" # ENI of the VPC Endpoint
-}
 
 resource "aws_route_table_association" "consumer_private_rta" {
   subnet_id      = aws_subnet.consumer_private_subnet.id
