@@ -110,14 +110,10 @@ This project  AWS infrastructure to connect two EC2 instances, one in a **Provid
 - Test HTTP access to the Provider instance from the Consumer instance.
 - Ensure SSH access works as expected via the bastion host.
 
-## **Troubleshooting**
-- Use `terraform show` to inspect deployed resources.
-- Check AWS EC2 instance logs for issues.
-- Validate VPC routing tables and security group configurations.
-- Use the AWS CLI to verify endpoint connectivity:
-  ```bash
-  aws ec2 describe-vpc-endpoints --filters "Name=vpc-id,Values=<consumer-vpc-id>"
-  ```
-
----
+From bastion host:
+```bash
+ curl vpce-0ee2c7cad1409b684-g1qg708r.vpce-svc-08ce4d7b607cf1279.us-west-2.vpce.amazonaws.com
+```
+Result:
+Hello, World!
 
