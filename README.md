@@ -1,119 +1,96 @@
-# AWS VPC Configuration for Provider and Consumer EC2 Instances
+# AWS VPC PrivateLink Connection
 
-This project  AWS infrastructure to connect two EC2 instances, one in a **Provider VPC** and another in a **Consumer VPC**, using a private link for secure communication. The infrastructure also includes a bastion host for accessing the consumer EC2 instance in a private subnet.
+A Terraform project that establishes secure communication between Provider and Consumer VPCs using AWS PrivateLink.
 
-## **Infrastructure Components**
+## Architecture Overview
 
-### **VPCs**
-- **Provider VPC**
- 
-- **Consumer VPC**
+![infrastructure](./image.png)
 
+## Key Components
 
-### **Internet Gateway**
-- Attached to the Consumer VPC (Bastion Host) for internet access via the public subnet.
+### 1. VPCs and Networking
+- **Provider VPC** (10.0.0.0/16)
+  - 2 private subnets
+  - Network Load Balancer
+  - Provider EC2 instance (running HTTP server)
 
-### **Route Tables**
-- **Provider VPC**: Routes traffic between private subnets and the private link.
-- **Consumer VPC**:
-  - Public Subnet Route Table: Routes internet traffic through the Internet Gateway.
-  - Private Subnet Route Table: Routes traffic to the Provider VPC via the private link.
+- **Consumer VPC** (10.1.0.0/16)
+  - 1 public subnet (for bastion host)
+  - 1 private subnet (for consumer instance)
+  - Internet Gateway
+  - VPC Endpoint
 
-### **Security Groups**
-- **Provider Instance SG**:
-  - Allows inbound traffic from the Network Load Balancer (NLB) on ports 22 and 80.
+### 2. Security
+- Private communication via AWS PrivateLink
+- Bastion host for secure SSH access
+- Isolated provider instance (no public access)
+- Defined security groups for each component
 
-- **Consumer Instance SG**:
-  - Allows inbound SSH traffic from the bastion host.
+### 3. Access Flow
+```
+Internet → Bastion Host → Consumer Instance → VPC Endpoint → NLB → Provider Instance
+```
 
-- **Bastion Host SG**:
-  - Allows inbound SSH traffic from a specific IP (e.g., your local machine).
+## Quick Start
 
-- **NLB SG**:
-  - Allows inbound traffic from the Consumer VPC's CIDR block.
+1. **Prerequisites**
+   - AWS CLI configured
+   - Terraform installed
+   - SSH key pair named "aleksey-pv" in AWS
 
-### **Network Load Balancer (NLB)**
-- Deployed in the Provider VPC.
-- Routes traffic to the Provider EC2 instance using:
-  - Target Group for HTTP (port 80).
-  - Target Group for SSH (port 22).
-
-### **Private Link**
-- Connects the Consumer VPC to the Provider VPC securely.
-- Uses an Interface VPC Endpoint in the Consumer VPC.
-
-### **EC2 Instances**
-- **Provider Instance**:
-  - Runs Nginx and is accessible via the private link.
-  - Located in a private subnet in the Provider VPC.
-
-- **Consumer Instance**:
-  - Located in a private subnet in the Consumer VPC.
-  - Connects to the Provider instance through the private link.
-
-- **Bastion Host**:
-  - Located in the public subnet of the Consumer VPC.
-  - Provides SSH access to the Consumer instance.
-
-## **File Structure**
-
-### **1. VPC Configuration**
-- `vpc_service_provider.tf`: Defines the Provider VPC, subnets, and route tables.
-- `vpc_service_consumer.tf`: Defines the Consumer VPC, subnets, internet gateway, and route tables.
-
-### **2. Security Groups**
-- `security_groups.tf`: Configures security groups for the Provider instance, Consumer instance, NLB, and bastion host.
-
-### **3. Network Load Balancer**
-- `network_load_balancer.tf`: Creates the NLB and its target groups and listeners.
-
-### **4. EC2 Instances**
-- `ec2_instances.tf`: Provisions EC2 instances (Provider, Consumer, and Bastion Host).
-
-### **5. Private Link**
-- `endpoint_provider.tf`: Defines the VPC Endpoint Service in the Provider VPC.
-- `endpoint_consumer.tf`: Creates the VPC Endpoint in the Consumer VPC.
-
-### **6. Variables**
-- `variables.tf`: Defines configurable variables such as CIDR blocks, instance types, and AMIs.
-
-### **7. Outputs**
-- `outputs.tf`: Outputs key resources like instance IPs and endpoint DNS names.
-
-## **Deployment Instructions**
-
-1. **Set Up AWS Credentials**
-   - Ensure you have AWS credentials configured in your environment.
-
-2. **Initialize Terraform**
+2. **Deploy**
    ```bash
    terraform init
-   ```
-
-3. **Plan the Deployment**
-   ```bash
    terraform plan
-   ```
-
-4. **Apply the Configuration**
-   ```bash
    terraform apply
    ```
 
-5. **Access Resources**
-   - SSH into the bastion host using its public IP.
-   - From the bastion host, SSH into the Consumer instance.
-   - Use the private link to connect to the Provider instance from the Consumer instance.
+3. **Access**
+   ```bash
+   # SSH to bastion host
+   ssh -i <ssh-key-name>.pem ec2-user@<bastion-public-ip>
 
-## **Testing the Setup**
-- Verify that the NLB health checks pass.
-- Test HTTP access to the Provider instance from the Consumer instance.
-- Ensure SSH access works as expected via the bastion host.
+   # From bastion, SSH to consumer instance
+   ssh -i <ssh-key-name>.pem ec2-user@<consumer-private-ip>
 
-From bastion host:
-```bash
- curl vpce-0ee2c7cad1409b684-g1qg708r.vpce-svc-08ce4d7b607cf1279.us-west-2.vpce.amazonaws.com
+   # Test connection to provider
+   curl vpce-xxx.vpce-svc-xxx.region.vpce.amazonaws.com
+   ```
+
+## Project Structure
+
 ```
-Result:
-Hello, World!
+.
+├── vpc_service_provider.tf    # Provider VPC configuration
+├── vpc_service_consumer.tf    # Consumer VPC configuration
+├── network_load_balancer.tf   # NLB setup
+├── endpoint_provider.tf       # VPC Endpoint Service
+├── endpoint_consumer.tf       # VPC Endpoint
+├── ec2_instances.tf          # EC2 instances
+├── security_groups.tf        # Security group rules
+├── variables.tf              # Variable definitions
+└── outputs.tf               # Output values
+```
+
+## Variables
+
+| Name | Description | Default |
+|------|-------------|---------|
+| region | AWS Region | us-west-2 |
+| provider_vpc_cidr | Provider VPC CIDR | 10.0.0.0/16 |
+| consumer_vpc_cidr | Consumer VPC CIDR | 10.1.0.0/16 |
+| instance_type | EC2 instance type | t3.micro |
+
+## Testing
+
+From the consumer instance, you should receive "Hello, World!" when curling the endpoint:
+```bash
+curl vpce-xxx.vpce-svc-xxx.region.vpce.amazonaws.com
+```
+
+## Security Notes
+- Provider instance is only accessible through PrivateLink
+- All private subnets have no direct internet access
+- Bastion host is the only instance with a public IP
+- Security groups follow least privilege principle
 
